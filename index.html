@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#122c28">
+  <meta name="description" content="An unofficial Oha Asa-inspired lucky-item generator for Shintarō Midorima. Draw a delightfully specific new lucky item or encounter.">
+  <title>Oha Asa | Lucky Item Generator</title>
+  <style>
+    :root {
+      --ink:#17352f; --deep:#102824; --paper:#fffaf0; --cream:#f3ead8;
+      --accent:#f1bd56; --red:#d85e4b; --leaf:#dbeada; --muted:#52655e;
+      --shadow:0 24px 70px rgba(7,30,24,.18);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-height:100vh;background:#e8eee7;color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+    button{font:inherit;cursor:pointer}
+    button:focus-visible,a:focus-visible{outline:3px solid #eb8e38;outline-offset:4px}
+    .page{max-width:1030px;margin:34px auto 64px;padding:0 24px}
+    .masthead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+    .brand{font-weight:900;letter-spacing:.21em;font-size:.82rem;color:var(--deep)}
+    .edition{font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#52776a;text-align:right}
+    .hero{overflow:hidden;position:relative;background:var(--deep);color:var(--paper);border-radius:26px 26px 0 0;padding:54px 56px 62px;isolation:isolate}
+    .hero:before{content:"";position:absolute;width:450px;height:450px;border:2px solid rgba(241,189,86,.14);border-radius:50%;top:-260px;right:-60px;box-shadow:0 0 0 30px rgba(241,189,86,.055),0 0 0 70px rgba(241,189,86,.035);z-index:-1}
+    .hero:after{content:"✦";position:absolute;right:10%;bottom:-46px;font-size:230px;color:rgba(241,189,86,.07);transform:rotate(16deg);z-index:-1}
+    .eyebrow{display:flex;align-items:center;gap:10px;color:var(--accent);font-size:.74rem;font-weight:850;letter-spacing:.25em;text-transform:uppercase}
+    .eyebrow:before{content:"";width:22px;height:2px;background:currentColor}
+    h1{font-family:Georgia,"Times New Roman",serif;font-weight:700;letter-spacing:-.055em;font-size:clamp(2.8rem,7vw,5.55rem);line-height:1.01;margin:17px 0 17px;max-width:770px}
+    .hero-sub{max-width:610px;color:#d3e3d9;font-size:1.07rem;line-height:1.7;margin:0}
+    .main{background:var(--paper);border-radius:0 0 26px 26px;padding:38px 56px 48px;box-shadow:var(--shadow)}
+    .controls{margin-bottom:26px}
+    .section-label{display:flex;align-items:center;gap:11px;color:var(--ink);font-size:.77rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase;margin-bottom:14px}
+    .section-label:after{content:"";height:1px;flex:1;background:#d5ded2}
+    .modes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+    .mode{background:#f4f2e9;color:var(--ink);border:1.5px solid #d8ded2;border-radius:10px;padding:12px 9px;font-size:.89rem;font-weight:750;transition:background .15s ease,transform .15s ease;white-space:nowrap}
+    .mode:hover{transform:translateY(-2px)}
+    .mode[aria-pressed="true"]{background:var(--deep);color:white;border-color:var(--deep)}
+    .result{position:relative;border:2px solid #254c40;border-radius:19px;background:linear-gradient(145deg,#fffefa 20%,#edf3e9);overflow:hidden}
+    .result-top{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--leaf);border-bottom:1px solid #c5d8c2;padding:13px 24px;color:#285143}
+    .result-top strong{font-size:.71rem;text-transform:uppercase;letter-spacing:.16em}
+    .result-top span{font-size:.76rem;font-weight:700}
+    .result-body{padding:29px 30px 33px}
+    .seal{height:69px;width:69px;display:grid;place-items:center;background:#f4d993;border:2px solid #2e5949;border-radius:50%;font-family:Georgia,serif;font-size:2.3rem;color:#214f41;box-shadow:6px 6px 0 #dae4d4;margin-bottom:23px}
+    .pretitle{color:#698077;font-size:.77rem;letter-spacing:.2em;text-transform:uppercase;font-weight:900}
+    h2{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.9rem,4vw,3.15rem);letter-spacing:-.03em;line-height:1.17;margin:8px 0 15px}
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
+    .detail{border-top:1px solid #c8d4c9;padding-top:15px}
+    .detail h3{color:#3b6a57;font-size:.75rem;text-transform:uppercase;letter-spacing:.14em;margin:0 0 8px}
+    .detail p{margin:0;color:#243d33;font-size:.96rem;line-height:1.65}
+    .actions{display:grid;grid-template-columns:1fr auto auto;gap:10px;margin-top:21px}
+    .btn{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;min-height:52px;padding:12px 19px;border:2px solid var(--deep);font-weight:800;font-size:.93rem}
+    .btn-main{color:#102824;background:var(--accent)}
+    .btn-main:hover{background:#ffd574}
+    .btn-alt{color:var(--deep);background:transparent}
+    .btn-alt:hover{background:#e7eee4}
+    .notice{height:25px;margin:8px 1px 0;font-size:.82rem;color:#456c5a;font-weight:700}
+    .lower{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;margin-top:22px}
+    .info{padding:19px 22px;border-radius:14px;background:#eaf0e5}
+    .info h3{margin:0 0 7px;font-family:Georgia,serif;font-size:1.28rem}
+    .info p{font-size:.9rem;line-height:1.6;color:#4e6158;margin:0}
+    .history-title{margin:0 0 10px;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase}
+    .history{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+    .history button{width:100%;text-align:left;border:1px solid #d6dfd3;background:#fff;border-radius:8px;color:#28483e;padding:8px 11px;font-size:.85rem}
+    .history button:hover{background:#e8f0e7}
+    .footnote{margin:21px auto 0;color:#70837b;text-align:center;font-size:.78rem;line-height:1.6;max-width:680px}
+    footer{margin-top:19px;text-align:center;font-size:.81rem;color:#567169}
+    @media (max-width:760px){
+      .page{margin:14px auto 40px;padding:0 12px}
+      .hero{padding:37px 25px 42px;border-radius:20px 20px 0 0}
+      .hero-sub{font-size:.95rem}.main{padding:24px 19px 30px;border-radius:0 0 20px 20px}
+      .modes{grid-template-columns:1fr 1fr}.result-body{padding:23px 20px 27px}
+      .detail-grid,.lower{grid-template-columns:1fr;gap:16px}
+      .actions{grid-template-columns:1fr 1fr}.btn-main{grid-column:1/-1}
+      .btn{padding:10px 12px;min-height:48px;font-size:.85rem}
+    }
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.mode{transition:none}}
+  </style>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <div class="brand">OHA ASA <span aria-hidden="true">✶</span> FORTUNE DESK</div>
+    <div class="edition">An unofficial fan project</div>
+  </header>
+  <section class="hero" aria-labelledby="main-title">
+    <div class="eyebrow">Every detail counts</div>
+    <h1 id="main-title">A little luck.<br>A lot of trouble.</h1>
+    <p class="hero-sub">Consult the morning's most questionable authority and discover Shintarō Midorima's next lucky item. Fate is particular. Takao is worse.</p>
+  </section>
+  <main class="main">
+    <div class="controls">
+      <div class="section-label">Choose your forecast</div>
+      <div class="modes" role="group" aria-label="Drawing style">
+        <button class="mode" type="button" data-mode="anything" aria-pressed="true">Anything goes</button>
+        <button class="mode" type="button" data-mode="portable" aria-pressed="false">Pocket-sized</button>
+        <button class="mode" type="button" data-mode="absurd" aria-pressed="false">Maximum trouble</button>
+        <button class="mode" type="button" data-mode="person" aria-pressed="false">Lucky person</button>
+      </div>
+    </div>
+    <article class="result" aria-live="polite" aria-atomic="true">
+      <div class="result-top"><strong>Today's lucky item</strong><span id="date-stamp">OHA ASA FORECAST</span></div>
+      <div class="result-body">
+        <div class="seal" id="seal" aria-hidden="true">✦</div>
+        <div class="pretitle" id="pretitle">Your fortune awaits</div>
+        <h2 id="item-name">The universe is deciding...</h2>
+        <div class="detail-grid">
+          <section class="detail"><h3>Exact requirement</h3><p id="requirement">Consulting the stars.</p></section>
+          <section class="detail"><h3>The inevitable complication</h3><p id="complication">Takao is already delighted.</p></section>
+        </div>
+      </div>
+    </article>
+    <div class="actions">
+      <button class="btn btn-main" type="button" id="draw-btn"><span aria-hidden="true">✦</span> Draw another item</button>
+      <button class="btn btn-alt" type="button" id="copy-btn">Copy fortune</button>
+      <button class="btn btn-alt" type="button" id="share-btn">Share this draw</button>
+    </div>
+    <div class="notice" id="notice" aria-live="polite"></div>
+    <div class="lower">
+      <section class="info"><h3>Oha Asa's entirely reasonable advice</h3><p>Carrying the correct item is essential. Whether the item fits in a schoolbag, interferes with basketball practice, or happens to be another human being is a separate matter.</p></section>
+      <section><h3 class="history-title">Recent fortunes</h3><ul class="history" id="history-list"><li>No previous draws yet.</li></ul></section>
+    </div>
+    <p class="footnote">The first Anything Goes forecast is shared by visitors on the same local calendar date. Further draws and mode changes are random. Your recent history stays in your own browser.</p>
+  </main>
+  <footer>Made by fans, for fans. Unofficial and not affiliated with the creators of Kuroko's Basketball or Persona 5.</footer>
+</div>
+<script>
+'use strict';
+// EDIT HERE: Add new objects to this list! Give each item two or more exact requirements.
+// Each object has a category: "portable", "curious", or "absurd".
+const objects = [
+  {id:'p01',category:'portable',name:'A Jade-Green Bookmark',needs:['It must have a tassel, and the tassel must be yellow.','The bookmark must be made of paper, with a pressed four-leaf clover visible under its laminate.']},
+  {id:'p02',category:'portable',name:'A Tiny Brass Padlock',needs:['Its keyhole must be heart-shaped, and the matching key must be present.','Its shackle must be scratched, but its body must be polished.']},
+  {id:'p03',category:'portable',name:'A Blue Glass Marble',needs:['A single white spiral must run through its center.','It must be transparent except for three orange swirls inside.']},
+  {id:'p04',category:'portable',name:'A Yellow Measuring Tape',needs:['The tape must retract automatically and have a black belt clip.','Its casing must be yellow, and the first centimeter mark must be clearly legible.']},
+  {id:'p05',category:'portable',name:'A Wooden Button',needs:['It must have exactly four holes and a natural, unvarnished finish.','It must be circular, with two holes and a small nick on the edge.']},
+  {id:'p06',category:'portable',name:'A Green Dice',needs:['It must have white pips, and the number six must face upward when carried.','It must be translucent, with rounded corners and no chipped edges.']},
+  {id:'p07',category:'portable',name:'A Vintage Train Ticket',needs:['The ticket must be punched once and bear a date ending in an even number.','It must have a red printed border and a visible station name.']},
+  {id:'p08',category:'portable',name:'A Pocket Mirror',needs:['Its back must show a painted crescent moon.','It must be circular, no wider than a palm, with a silver-colored frame.']},
+  {id:'p09',category:'portable',name:'A Tiny Wooden Spoon',needs:['It must have a round bowl and a handle carved with three grooves.','It must be shorter than twelve centimeters and completely unpainted.']},
+  {id:'p10',category:'portable',name:'A Red Binder Clip',needs:['The handles must be silver, and both must fold flat.','It must hold exactly one blank square of paper.']},
+  {id:'p11',category:'portable',name:'A Metal Bottle Cap',needs:['The top must be green and have a five-pointed star printed on it.','Its underside must have an intact white plastic seal.']},
+  {id:'p12',category:'portable',name:'A Miniature Compass',needs:['The needle must have a red north-pointing end and a clear cover.','Its case must be brass-colored, with a small loop for a chain.']},
+  {id:'p13',category:'portable',name:'A Lavender Eraser',needs:['It must be rectangular and still have its original paper sleeve.','It must smell faintly of lavender and have one cleanly cut corner.']},
+  {id:'p14',category:'portable',name:'A Paper Fortune Teller',needs:['It must be folded from pale blue paper and show exactly eight numbered flaps.','Every outer flap must be decorated with a different colored dot.']},
+  {id:'p15',category:'portable',name:'A Pinecone Keychain',needs:['The pinecone must be wooden, not plastic, and hang from a gold-colored ring.','It must have at least nine visible scales and no painted glitter.']},
+  {id:'p16',category:'portable',name:'A Miniature Abacus',needs:['It must have five rows of beads, with at least one red bead per row.','Its frame must be wooden and smaller than a smartphone.']},
+  {id:'p17',category:'portable',name:'A Ceramic Tea-Bag Holder',needs:['It must be leaf-shaped and glazed in pale mint green.','It must have a scalloped edge and a tiny blue flower painted near the tip.']},
+  {id:'p18',category:'portable',name:'A Pink Safety Pin',needs:['It must have a pink-coated head and a silver shaft.','It must remain fastened through a folded strip of white cotton.']},
+  {id:'p19',category:'portable',name:'A Wooden Clothes Peg',needs:['Its wooden jaws must be stamped with a small sun.','Its metal spring must be clean, and one end must be painted red.']},
+  {id:'p20',category:'portable',name:'A Green Wax Crayon',needs:['Its paper wrapper must remain at least halfway intact.','It must be forest green and worn to exactly half its original length.']},
+  {id:'p21',category:'portable',name:'A Shell-Shaped Hair Clip',needs:['It must have a pearly white finish and a functioning metal clasp.','Its surface must be ridged, with no missing teeth on the clasp.']},
+  {id:'p22',category:'portable',name:'A Small Tin Whistle',needs:['It must produce a clear note and be tied to a blue cord.','It must be silver-colored and have precisely two round holes.']},
+  {id:'p23',category:'portable',name:'A Ceramic Cat Bell',needs:['It must be white with a single painted orange ear.','Its clapper must work, but it may only be rung once before noon.']},
+  {id:'p24',category:'portable',name:'A Miniature Hourglass',needs:['The sand must be green, and the hourglass must run for one minute.','Its frame must be wooden and shorter than ten centimeters.']},
+  {id:'p25',category:'portable',name:'A White Chess Pawn',needs:['It must be wooden with a felt-covered base.','It must have a clearly rounded head and no scratches on the stem.']},
+  {id:'p26',category:'portable',name:'A Little Rubber Stamp',needs:['It must stamp the outline of a star in blue ink.','Its handle must be square and made of unpainted wood.']},
+  {id:'p27',category:'portable',name:'A Copper Coin',needs:['Its year must contain the digit seven, and its face must be legible.','It must have a visibly worn edge but no holes.']},
+  {id:'p28',category:'portable',name:'A Ceramic Egg Cup',needs:['It must be sky blue with white polka dots.','It must stand on three tiny feet and have a yellow painted rim.']},
+  {id:'c01',category:'curious',name:'A Folding Paper Fan',needs:['It must depict a mountain beneath a violet sky.','Its ribs must be black, and its fabric must show at least three cranes.']},
+  {id:'c02',category:'curious',name:'A Little Desk Bell',needs:['It must have a brass-colored dome and a wooden base.','Its ring must be audible from across an ordinary classroom.']},
+  {id:'c03',category:'curious',name:'A Porcelain Teapot',needs:['It must have a painted blue fish on one side and no cracks.','Its lid must fit snugly and be topped with a round green knob.']},
+  {id:'c04',category:'curious',name:'A Miniature Garden Gnome',needs:['His hat must be red and his boots must be blue.','He must be holding a tiny watering can in his left hand.']},
+  {id:'c05',category:'curious',name:'A Small Bamboo Wind Chime',needs:['It must have exactly three bamboo tubes of different lengths.','Its hanging tag must be cut into the shape of a cloud.']},
+  {id:'c06',category:'curious',name:'A Model Sailing Boat',needs:['Its sail must be striped white and green.','Its hull must be blue, and it must have a miniature wooden anchor.']},
+  {id:'c07',category:'curious',name:'A Lavender Candle',needs:['The candle must be unused and housed in a hexagonal glass jar.','Its wax must be pale violet, with no visible air bubbles.']},
+  {id:'c08',category:'curious',name:'A Tiny Birdhouse',needs:['The roof must be painted yellow and the entrance must be round.','It must hang from a loop of green twine.']},
+  {id:'c09',category:'curious',name:'A Toy Kaleidoscope',needs:['Its tube must be blue, and its eyepiece must be orange.','It must produce at least one clearly visible five-pointed star pattern.']},
+  {id:'c10',category:'curious',name:'A Pair of Red Mittens',needs:['Both must have white cuffs, and neither may have a loose thread.','The left mitten must have a tiny embroidered snowflake.']},
+  {id:'c11',category:'curious',name:'A Hand-Painted Ceramic Goose',needs:['Its beak must be yellow and its neck curved to the left.','There must be a blue ribbon painted around its neck.']},
+  {id:'c12',category:'curious',name:'A Velvet Jewelry Box',needs:['Its lining must be emerald green and its latch gold-colored.','It must contain precisely one white button.']},
+  {id:'c13',category:'curious',name:'A Decorative Wooden Paddle',needs:['It must feature three hand-painted blue waves.','Its handle must be wrapped with a single strand of white cord.']},
+  {id:'c14',category:'curious',name:'A Toy Tambourine',needs:['It must have four pairs of jingles and a yellow rim.','Its drumhead must be decorated with a small smiling sun.']},
+  {id:'c15',category:'curious',name:'A Ceramic Soap Dish',needs:['It must resemble a pale green leaf and have three drainage holes.','Its edges must be scalloped and its glaze unchipped.']},
+  {id:'c16',category:'curious',name:'A Miniature Wooden Ladder',needs:['It must have exactly seven rungs and no splinters.','Its sides must be painted white while the rungs remain unpainted.']},
+  {id:'a01',category:'absurd',name:'A Full-Sized Garden Flamingo',needs:['It must be pink, with one foot raised and a black beak.','It must be attached to its original metal ground stakes.']},
+  {id:'a02',category:'absurd',name:'A Folding Beach Chair',needs:['Its fabric must have alternating yellow and green stripes.','Its armrests must be made of wood and the chair must still fold correctly.']},
+  {id:'a03',category:'absurd',name:'A Three-Tier Cake Stand',needs:['All three plates must be different shades of blue.','Its top handle must be shaped like a small heart.']},
+  {id:'a04',category:'absurd',name:'A Tall Umbrella Stand',needs:['It must be shaped like a boot and painted forest green.','It must contain one umbrella with a curved wooden handle.']},
+  {id:'a05',category:'absurd',name:'A Life-Sized Cardboard Sunflower',needs:['Its center must be brown and it must have exactly eleven petals.','It must be able to stand upright without anyone holding it.']},
+  {id:'a06',category:'absurd',name:'A Folding Laundry Rack',needs:['Its frame must be white and it must have eight horizontal rails.','It must be fully extended whenever Midorima is standing still.']},
+  {id:'a07',category:'absurd',name:'A Decorative Birdcage',needs:['It must be empty, mint green, and have a heart-shaped door.','It must have a brass-colored hook and exactly six vertical bars on its front.']},
+  {id:'a08',category:'absurd',name:'A Giant Plush Carrot',needs:['It must be longer than Midorima’s forearm and have three felt leaves.','Its orange fabric must be embroidered with five short white lines.']},
+  {id:'a09',category:'absurd',name:'A Wooden Step Stool',needs:['It must have exactly two steps and blue rubber feet.','Its top step must show a painted white star.']},
+  {id:'a10',category:'absurd',name:'A Large Wicker Picnic Basket',needs:['Its lining must be red gingham and its handles must curve outward.','It must contain one folded blue napkin and nothing else.']},
+  {id:'a11',category:'absurd',name:'A Freestanding Coat Rack',needs:['It must have exactly five hooks and a round wooden base.','The highest hook must hold one yellow ribbon.']},
+  {id:'a12',category:'absurd',name:'A Small Garden Watering Can',needs:['Its spout must have a removable rose, and its body must be lilac.','It must hold at least one liter without leaking.']},
+  {id:'a13',category:'absurd',name:'A Square Floor Cushion',needs:['It must have an embroidered white crane in one corner.','Its cover must be moss green and have a visible zipper.']},
+  {id:'a14',category:'absurd',name:'A Desk-Sized Moon Lamp',needs:['It must glow warm yellow and rest on a wooden stand.','It must be spherical, rechargeable, and patterned with raised craters.']}
+];
+
+const people = [
+  {id:'h01',name:'Someone Wearing Two Different Socks',needs:['One sock must be green and the other yellow.','Neither sock may have stripes.']},
+  {id:'h02',name:'A Person Carrying a Red Umbrella',needs:['The umbrella must have a hooked wooden handle.','Its canopy must be plain red, with no logos.']},
+  {id:'h03',name:'Someone With a Star-Shaped Hair Clip',needs:['The clip must be worn on the right side.','The star must be silver, not gold.']},
+  {id:'h04',name:'A Left-Handed Sketch Artist',needs:['They must be drawing in a paper notebook.','The drawing must contain at least one flower.']},
+  {id:'h05',name:'Someone Born on a Tuesday',needs:['They must know their birth date well enough to verify the weekday.','They must be wearing something blue at the time of the meeting.']},
+  {id:'h06',name:'A Person With Green Shoelaces',needs:['Both shoes must have the same shade of green laces.','The shoes themselves must be predominantly white.']},
+  {id:'h07',name:'Someone Reading a Book Upside Down',needs:['They must be doing so deliberately.','The book must have a purple cover.']},
+  {id:'h08',name:'A Person With a Crescent-Moon Pin',needs:['The pin must be on their outermost jacket.','The crescent must point to the left.']},
+  {id:'h09',name:'Someone Carrying a Bouquet of Daisies',needs:['The bouquet must contain at least five white daisies.','It must be tied with blue string rather than ribbon.']},
+  {id:'h10',name:'A Person Wearing Round Red Glasses',needs:['Both frames must be perfectly circular.','They must have a black glasses case with them.']},
+  {id:'h11',name:'Someone With a Lucky Number of Seven',needs:['They must volunteer the number without prompting.','They must also be carrying a pen.']},
+  {id:'h12',name:'A Person Wearing a Sunflower Brooch',needs:['The brooch must have a green felt leaf.','It must be pinned above the waist, on the left side.']}
+];
+
+// EDIT HERE: Add or change complications. They should work with almost any item.
+const objectTroubles = [
+  'Takao offers to carry it for him, then announces a very unreasonable rental fee.',
+  'Takao insists it deserves a seat of its own. Midorima refuses to dignify this suggestion.',
+  'Kuroko asks, perfectly straight-faced, whether the item has been registered as a Phantom Thief.',
+  'Kagami asks if it is actually necessary. Midorima spends the next five minutes explaining why that is a ridiculous question.',
+  'Kise calls it a bold fashion statement and asks to photograph it. Midorima immediately regrets bringing it outside.',
+  'Takao refers to it as their newest teammate for the rest of the morning.',
+  'Midorima wraps it so carefully that he cannot retrieve it before the school bell rings.',
+  'A classmate asks why he brought it to school. “Oha Asa,” Midorima answers. Somehow, this raises more questions.',
+  'Takao threatens to give it a nickname. Midorima is forced to spend lunch supervising the situation.',
+  'Midorima refuses to set it down. Takao politely wonders how he intends to change into his basketball uniform.',
+  'Someone mistakes it for a gift. Midorima has to explain that it is neither decorative nor negotiable.',
+  'Takao hides it in plain sight and times how long it takes Midorima to notice. The answer is four seconds.'
+];
+const personTroubles = [
+  'Takao says that Midorima cannot simply collect people like keychains. Midorima insists that no collecting is involved.',
+  'Midorima attempts to remain within three meters of the person without explaining why. This goes about as well as expected.',
+  'Kuroko offers to introduce himself, then asks if the horoscope has specified a minimum conversation length.',
+  'Takao happily volunteers to interview the stranger. Midorima spends the entire exchange wishing for a normal object.',
+  'The person asks if they know each other. Midorima says “No,” then struggles to explain why this meeting is essential.',
+  'Takao calls it “socializing by horoscope.” Midorima objects to the phrasing, not the procedure.',
+  'Kise tries to help identify a suitable person and turns the search into a highly unnecessary fashion investigation.',
+  'The lucky stranger leaves before Midorima can confirm the final detail. Takao calls it a dramatic cliffhanger.'
+];
+const modeNames={anything:'Anything goes',portable:'Pocket-sized',absurd:'Maximum trouble',person:'Lucky person'};
+const icons=['✦','☼','✳','✧','✴','❋'];
+let activeMode='anything',current=null,history=[];
+const all=[...objects,...people];
+const $=id=>document.getElementById(id);
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+function hash32(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function dailyRandom(seed){let x=hash32(seed);return ()=>{x+=0x6D2B79F5;let t=x;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296}}
+function sample(items,rng){return items[Math.floor(rng()*items.length)]}
+function byId(id){return all.find(x=>x.id===id)}
+function poolFor(mode,rng){
+ if(mode==='portable')return objects.filter(x=>x.category==='portable');
+ if(mode==='absurd')return objects.filter(x=>x.category==='absurd');
+ if(mode==='person')return people;
+ const r=rng();
+ if(r<.13)return people;
+ if(r<.64)return objects.filter(x=>x.category==='portable');
+ if(r<.83)return objects.filter(x=>x.category==='curious');
+ return objects.filter(x=>x.category==='absurd');
+}
+function buildDraw(mode,rng,exclude=[]){
+ let pool=poolFor(mode,rng);let possible=pool.filter(x=>!exclude.includes(x.id));
+ if(possible.length===0)possible=pool;
+ const item=sample(possible,rng),ni=Math.floor(rng()*item.needs.length),ci=Math.floor(rng()*(people.includes(item)?personTroubles.length:objectTroubles.length));
+ return {id:item.id,ni,ci,mode};
+}
+function drawInfo(draw){
+ const item=byId(draw.id);if(!item)return null;
+ const troubles=people.includes(item)?personTroubles:objectTroubles;
+ return {item,need:item.needs[draw.ni]||item.needs[0],trouble:troubles[draw.ci]||troubles[0],person:people.includes(item)};
+}
+function render(draw,addHistory=true){
+ const data=drawInfo(draw);if(!data)return;
+ current=draw;
+ $('item-name').textContent=data.item.name;
+ $('requirement').textContent=data.need;
+ $('complication').textContent=data.trouble;
+ $('pretitle').textContent=data.person?'Your lucky encounter':'Your lucky object';
+ $('seal').textContent=icons[hash32(draw.id)%icons.length];
+ $('date-stamp').textContent=new Date().toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+ if(addHistory){history=[draw,...history.filter(old=>old.id!==draw.id)].slice(0,8);saveHistory()}
+ renderHistory();$('notice').textContent='';
+}
+function saveHistory(){try{localStorage.setItem('ohaasa-history-v1',JSON.stringify(history))}catch(e){/* storage unavailable */}}
+function readHistory(){try{let raw=JSON.parse(localStorage.getItem('ohaasa-history-v1')||'[]');if(Array.isArray(raw))history=raw.filter(d=>d&&typeof d.id==='string'&&byId(d.id)).slice(0,8)}catch(e){history=[]}}
+function renderHistory(){
+ const list=$('history-list');list.replaceChildren();
+ if(history.length<2){const li=document.createElement('li');li.textContent='Your next discoveries will appear here.';list.append(li);return}
+ for(const drawn of history.slice(1,5)){
+   const item=byId(drawn.id);if(!item)continue;
+   const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.textContent=item.name;b.addEventListener('click',()=>{activeMode=drawn.mode||'anything';setModes();render(drawn,false)});li.append(b);list.append(li);
+ }
+}
+function setModes(){document.querySelectorAll('.mode').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===activeMode)))}
+function newDraw(){const recent=history.map(x=>x.id),previous=current?[current.id]:[];render(buildDraw(activeMode,Math.random,[...recent,...previous]));}
+async function copyText(value,success){
+ try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(value)}else throw Error('fallback')}
+ catch(e){const input=document.createElement('textarea');input.value=value;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const ok=document.execCommand('copy');input.remove();if(!ok){$('notice').textContent='Copying is unavailable in this browser. Please select and copy the result manually.';return}}
+ $('notice').textContent=success;
+}
+function fortuneText(){const d=drawInfo(current);return `OHA ASA: ${d.item.name}\nExact requirement: ${d.need}\nThe complication: ${d.trouble}`}
+function shareLink(){const url=new URL(window.location.href);url.searchParams.set('draw',[current.id,current.ni,current.ci,current.mode].join('.'));return url.toString()}
+function drawFromUrl(){
+ const raw=new URLSearchParams(window.location.search).get('draw');if(!raw)return null;
+ const [id,ni,ci,mode]=raw.split('.');const item=byId(id),needs=item&&item.needs,troubles=people.includes(item)?personTroubles:objectTroubles;
+ if(!item||!modeNames[mode]||!/^\d+$/.test(ni||'')||!/^\d+$/.test(ci||'')||Number(ni)>=needs.length||Number(ci)>=troubles.length)return null;
+ return {id,ni:Number(ni),ci:Number(ci),mode};
+}
+document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>{activeMode=b.dataset.mode;setModes();newDraw()}));
+$('draw-btn').addEventListener('click',newDraw);
+$('copy-btn').addEventListener('click',()=>copyText(fortuneText(),'Fortune copied!'));
+$('share-btn').addEventListener('click',()=>copyText(shareLink(),'Link copied! Send it to a friend after publishing your website.'));
+readHistory();
+const linkDraw=drawFromUrl();
+if(linkDraw){activeMode=linkDraw.mode;setModes();render(linkDraw)}
+else {const rng=dailyRandom(today()+':anything:v1');render(buildDraw('anything',rng),false);}
+</script>
+</body>
+</html>
